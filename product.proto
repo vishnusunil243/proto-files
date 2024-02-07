@@ -4,6 +4,8 @@ package product;
 
 option go_package="./pb";
 
+import "google/protobuf/empty.proto";
+
 message AddProductRequest {
     string name=1;
     int32 price=2;
@@ -17,6 +19,8 @@ message AddProductResponse{
     int32 quantity =4;
 }
 
+
 service ProductService {
     rpc AddProduct(AddProductRequest)returns(AddProductResponse);
+    rpc GetAllProducts(google.protobuf.Empty)returns(stream AddProductResponse){}
 }

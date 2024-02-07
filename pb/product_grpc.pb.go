@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -23,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductServiceClient interface {
 	AddProduct(ctx context.Context, in *AddProductRequest, opts ...grpc.CallOption) (*AddProductResponse, error)
+	GetAllProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (ProductService_GetAllProductsClient, error)
 }
 
 type productServiceClient struct {
@@ -42,11 +44,44 @@ func (c *productServiceClient) AddProduct(ctx context.Context, in *AddProductReq
 	return out, nil
 }
 
+func (c *productServiceClient) GetAllProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (ProductService_GetAllProductsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ProductService_ServiceDesc.Streams[0], "/product.ProductService/GetAllProducts", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &productServiceGetAllProductsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ProductService_GetAllProductsClient interface {
+	Recv() (*AddProductResponse, error)
+	grpc.ClientStream
+}
+
+type productServiceGetAllProductsClient struct {
+	grpc.ClientStream
+}
+
+func (x *productServiceGetAllProductsClient) Recv() (*AddProductResponse, error) {
+	m := new(AddProductResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
 	AddProduct(context.Context, *AddProductRequest) (*AddProductResponse, error)
+	GetAllProducts(*emptypb.Empty, ProductService_GetAllProductsServer) error
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -56,6 +91,9 @@ type UnimplementedProductServiceServer struct {
 
 func (UnimplementedProductServiceServer) AddProduct(context.Context, *AddProductRequest) (*AddProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddProduct not implemented")
+}
+func (UnimplementedProductServiceServer) GetAllProducts(*emptypb.Empty, ProductService_GetAllProductsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllProducts not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
@@ -88,6 +126,27 @@ func _ProductService_AddProduct_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_GetAllProducts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(emptypb.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProductServiceServer).GetAllProducts(m, &productServiceGetAllProductsServer{stream})
+}
+
+type ProductService_GetAllProductsServer interface {
+	Send(*AddProductResponse) error
+	grpc.ServerStream
+}
+
+type productServiceGetAllProductsServer struct {
+	grpc.ServerStream
+}
+
+func (x *productServiceGetAllProductsServer) Send(m *AddProductResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,6 +159,12 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProductService_AddProduct_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllProducts",
+			Handler:       _ProductService_GetAllProducts_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "product.proto",
 }
