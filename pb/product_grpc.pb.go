@@ -25,6 +25,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ProductServiceClient interface {
 	AddProduct(ctx context.Context, in *AddProductRequest, opts ...grpc.CallOption) (*AddProductResponse, error)
 	GetAllProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (ProductService_GetAllProductsClient, error)
+	GetProduct(ctx context.Context, in *GetProductById, opts ...grpc.CallOption) (*AddProductResponse, error)
+	UpdateQuantity(ctx context.Context, in *UpdateQuantityRequest, opts ...grpc.CallOption) (*AddProductResponse, error)
 }
 
 type productServiceClient struct {
@@ -76,12 +78,32 @@ func (x *productServiceGetAllProductsClient) Recv() (*AddProductResponse, error)
 	return m, nil
 }
 
+func (c *productServiceClient) GetProduct(ctx context.Context, in *GetProductById, opts ...grpc.CallOption) (*AddProductResponse, error) {
+	out := new(AddProductResponse)
+	err := c.cc.Invoke(ctx, "/product.ProductService/GetProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) UpdateQuantity(ctx context.Context, in *UpdateQuantityRequest, opts ...grpc.CallOption) (*AddProductResponse, error) {
+	out := new(AddProductResponse)
+	err := c.cc.Invoke(ctx, "/product.ProductService/UpdateQuantity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
 	AddProduct(context.Context, *AddProductRequest) (*AddProductResponse, error)
 	GetAllProducts(*emptypb.Empty, ProductService_GetAllProductsServer) error
+	GetProduct(context.Context, *GetProductById) (*AddProductResponse, error)
+	UpdateQuantity(context.Context, *UpdateQuantityRequest) (*AddProductResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -94,6 +116,12 @@ func (UnimplementedProductServiceServer) AddProduct(context.Context, *AddProduct
 }
 func (UnimplementedProductServiceServer) GetAllProducts(*emptypb.Empty, ProductService_GetAllProductsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAllProducts not implemented")
+}
+func (UnimplementedProductServiceServer) GetProduct(context.Context, *GetProductById) (*AddProductResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProduct not implemented")
+}
+func (UnimplementedProductServiceServer) UpdateQuantity(context.Context, *UpdateQuantityRequest) (*AddProductResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateQuantity not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
@@ -147,6 +175,42 @@ func (x *productServiceGetAllProductsServer) Send(m *AddProductResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _ProductService_GetProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductById)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product.ProductService/GetProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetProduct(ctx, req.(*GetProductById))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_UpdateQuantity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateQuantityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).UpdateQuantity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product.ProductService/UpdateQuantity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).UpdateQuantity(ctx, req.(*UpdateQuantityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -157,6 +221,14 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddProduct",
 			Handler:    _ProductService_AddProduct_Handler,
+		},
+		{
+			MethodName: "GetProduct",
+			Handler:    _ProductService_GetProduct_Handler,
+		},
+		{
+			MethodName: "UpdateQuantity",
+			Handler:    _ProductService_UpdateQuantity_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

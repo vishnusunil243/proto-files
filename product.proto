@@ -18,9 +18,18 @@ message AddProductResponse{
     int32 price=3;
     int32 quantity =4;
 }
-
+message UpdateQuantityRequest{
+    uint32 id=1;
+    int32 quantity=2;
+    bool increase =3;
+}
+message GetProductById{
+    int32 id=1;
+}
 
 service ProductService {
     rpc AddProduct(AddProductRequest)returns(AddProductResponse);
     rpc GetAllProducts(google.protobuf.Empty)returns(stream AddProductResponse){}
+    rpc GetProduct(GetProductById)returns(AddProductResponse);
+    rpc UpdateQuantity(UpdateQuantityRequest)returns(AddProductResponse);
 }
