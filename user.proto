@@ -4,6 +4,7 @@ package user;
 
 option go_package="./pb";
 
+import "google/protobuf/empty.proto";
 
 
 message UserSignupRequest{
@@ -25,4 +26,7 @@ service UserService{
     rpc UserLogin(UserLoginRequest)returns(UserSignupResponse);
     rpc AdminLogin(UserLoginRequest)returns(UserSignupResponse);
     rpc SuperAdminLogin(UserLoginRequest)returns(UserSignupResponse);
+    rpc GetAllUsers(google.protobuf.Empty)returns(stream UserSignupResponse);
+    rpc GetAllAdmins(google.protobuf.Empty)returns(stream UserSignupResponse);
+    rpc AddAdmin(UserSignupRequest)returns(UserSignupResponse);
 }
