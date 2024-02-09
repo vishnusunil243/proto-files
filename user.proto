@@ -21,6 +21,9 @@ message UserLoginRequest{
     string email=1;
     string password=2;
 }
+message GetUserById{
+    uint32 id=1;
+}
 service UserService{
     rpc UserSignup(UserSignupRequest)returns(UserSignupResponse);
     rpc UserLogin(UserLoginRequest)returns(UserSignupResponse);
@@ -29,4 +32,6 @@ service UserService{
     rpc GetAllUsers(google.protobuf.Empty)returns(stream UserSignupResponse){}
     rpc GetAllAdmins(google.protobuf.Empty)returns(stream UserSignupResponse){}
     rpc AddAdmin(UserSignupRequest)returns(UserSignupResponse);
+    rpc GetAdmin(GetUserById)returns(UserSignupResponse);
+    rpc GetUser(GetUserById)returns(UserSignupResponse);
 }
