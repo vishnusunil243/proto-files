@@ -1,0 +1,28 @@
+syntax="proto3";
+
+package cart;
+
+
+option go_package="./pb";
+
+import "google/protobuf/empty.proto";
+
+
+
+message UserCartCreate{
+    uint32 userId=1;
+}
+message AddToCartRequest{
+    uint32 userId=1;
+    uint32 productId=2;
+    int32 quantity=3;
+}
+message RemoveFromCartRequest{
+    uint32 userId=1;
+    uint32 productId=2;
+}
+service CartService{
+    rpc CreateCart(UserCartCreate)returns(google.protobuf.Empty);
+    rpc AddToCart(AddToCartRequest)returns(stream AddToCartRequest){}
+    rpc RemoveFromCart(RemoveFromCartRequest)returns(stream AddToCartRequest){}
+}
