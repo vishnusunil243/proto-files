@@ -61,7 +61,7 @@ func (c *cartServiceClient) AddToCart(ctx context.Context, in *AddToCartRequest,
 }
 
 type CartService_AddToCartClient interface {
-	Recv() (*AddToCartRequest, error)
+	Recv() (*AddToCartResponse, error)
 	grpc.ClientStream
 }
 
@@ -69,8 +69,8 @@ type cartServiceAddToCartClient struct {
 	grpc.ClientStream
 }
 
-func (x *cartServiceAddToCartClient) Recv() (*AddToCartRequest, error) {
-	m := new(AddToCartRequest)
+func (x *cartServiceAddToCartClient) Recv() (*AddToCartResponse, error) {
+	m := new(AddToCartResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *cartServiceClient) RemoveFromCart(ctx context.Context, in *RemoveFromCa
 }
 
 type CartService_RemoveFromCartClient interface {
-	Recv() (*AddToCartRequest, error)
+	Recv() (*AddToCartResponse, error)
 	grpc.ClientStream
 }
 
@@ -101,8 +101,8 @@ type cartServiceRemoveFromCartClient struct {
 	grpc.ClientStream
 }
 
-func (x *cartServiceRemoveFromCartClient) Recv() (*AddToCartRequest, error) {
-	m := new(AddToCartRequest)
+func (x *cartServiceRemoveFromCartClient) Recv() (*AddToCartResponse, error) {
+	m := new(AddToCartResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func _CartService_AddToCart_Handler(srv interface{}, stream grpc.ServerStream) e
 }
 
 type CartService_AddToCartServer interface {
-	Send(*AddToCartRequest) error
+	Send(*AddToCartResponse) error
 	grpc.ServerStream
 }
 
@@ -180,7 +180,7 @@ type cartServiceAddToCartServer struct {
 	grpc.ServerStream
 }
 
-func (x *cartServiceAddToCartServer) Send(m *AddToCartRequest) error {
+func (x *cartServiceAddToCartServer) Send(m *AddToCartResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -193,7 +193,7 @@ func _CartService_RemoveFromCart_Handler(srv interface{}, stream grpc.ServerStre
 }
 
 type CartService_RemoveFromCartServer interface {
-	Send(*AddToCartRequest) error
+	Send(*AddToCartResponse) error
 	grpc.ServerStream
 }
 
@@ -201,7 +201,7 @@ type cartServiceRemoveFromCartServer struct {
 	grpc.ServerStream
 }
 
-func (x *cartServiceRemoveFromCartServer) Send(m *AddToCartRequest) error {
+func (x *cartServiceRemoveFromCartServer) Send(m *AddToCartResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
