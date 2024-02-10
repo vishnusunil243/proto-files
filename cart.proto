@@ -5,10 +5,14 @@ package cart;
 
 option go_package="./pb";
 
-import "google/protobuf/empty.proto";
 
 
 
+message CartResponse{
+    uint32 cartId=1;
+    uint32 userId=2;
+    bool isEmpty=3;
+}
 message UserCartCreate{
     uint32 userId=1;
 }
@@ -28,7 +32,7 @@ message AddToCartResponse{
     float total=4;
 }
 service CartService{
-    rpc CreateCart(UserCartCreate)returns(google.protobuf.Empty);
-    rpc AddToCart(AddToCartRequest)returns(google.protobuf.Empty);
-    rpc RemoveFromCart(RemoveFromCartRequest)returns(google.protobuf.Empty);
+    rpc CreateCart(UserCartCreate)returns(CartResponse);
+    rpc AddToCart(AddToCartRequest)returns(CartResponse);
+    rpc RemoveFromCart(RemoveFromCartRequest)returns(CartResponse);
 }
