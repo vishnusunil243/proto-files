@@ -29,6 +29,6 @@ message AddToCartResponse{
 }
 service CartService{
     rpc CreateCart(UserCartCreate)returns(google.protobuf.Empty);
-    rpc AddToCart(AddToCartRequest)returns(stream AddToCartResponse){}
-    rpc RemoveFromCart(RemoveFromCartRequest)returns(stream AddToCartResponse){}
+    rpc AddToCart(AddToCartRequest)returns(google.protobuf.Empty);
+    rpc RemoveFromCart(RemoveFromCartRequest)returns(google.protobuf.Empty);
 }
