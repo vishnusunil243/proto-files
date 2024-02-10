@@ -25,6 +25,7 @@ type CartServiceClient interface {
 	CreateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*CartResponse, error)
 	AddToCart(ctx context.Context, in *AddToCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	RemoveFromCart(ctx context.Context, in *RemoveFromCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
+	GetAllCartItems(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (CartService_GetAllCartItemsClient, error)
 }
 
 type cartServiceClient struct {
@@ -62,6 +63,38 @@ func (c *cartServiceClient) RemoveFromCart(ctx context.Context, in *RemoveFromCa
 	return out, nil
 }
 
+func (c *cartServiceClient) GetAllCartItems(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (CartService_GetAllCartItemsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &CartService_ServiceDesc.Streams[0], "/cart.CartService/GetAllCartItems", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &cartServiceGetAllCartItemsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type CartService_GetAllCartItemsClient interface {
+	Recv() (*GetAllCartResponse, error)
+	grpc.ClientStream
+}
+
+type cartServiceGetAllCartItemsClient struct {
+	grpc.ClientStream
+}
+
+func (x *cartServiceGetAllCartItemsClient) Recv() (*GetAllCartResponse, error) {
+	m := new(GetAllCartResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CartServiceServer is the server API for CartService service.
 // All implementations must embed UnimplementedCartServiceServer
 // for forward compatibility
@@ -69,6 +102,7 @@ type CartServiceServer interface {
 	CreateCart(context.Context, *UserCartCreate) (*CartResponse, error)
 	AddToCart(context.Context, *AddToCartRequest) (*CartResponse, error)
 	RemoveFromCart(context.Context, *RemoveFromCartRequest) (*CartResponse, error)
+	GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error
 	mustEmbedUnimplementedCartServiceServer()
 }
 
@@ -84,6 +118,9 @@ func (UnimplementedCartServiceServer) AddToCart(context.Context, *AddToCartReque
 }
 func (UnimplementedCartServiceServer) RemoveFromCart(context.Context, *RemoveFromCartRequest) (*CartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveFromCart not implemented")
+}
+func (UnimplementedCartServiceServer) GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllCartItems not implemented")
 }
 func (UnimplementedCartServiceServer) mustEmbedUnimplementedCartServiceServer() {}
 
@@ -152,6 +189,27 @@ func _CartService_RemoveFromCart_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CartService_GetAllCartItems_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(UserCartCreate)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CartServiceServer).GetAllCartItems(m, &cartServiceGetAllCartItemsServer{stream})
+}
+
+type CartService_GetAllCartItemsServer interface {
+	Send(*GetAllCartResponse) error
+	grpc.ServerStream
+}
+
+type cartServiceGetAllCartItemsServer struct {
+	grpc.ServerStream
+}
+
+func (x *cartServiceGetAllCartItemsServer) Send(m *GetAllCartResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // CartService_ServiceDesc is the grpc.ServiceDesc for CartService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,6 +230,12 @@ var CartService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CartService_RemoveFromCart_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllCartItems",
+			Handler:       _CartService_GetAllCartItems_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "cart.proto",
 }
