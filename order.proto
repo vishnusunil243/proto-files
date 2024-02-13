@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package order;
+
+option go_package="./pb";
+
+
+message OrderRequest{
+   uint32 userId =1;
+}
+message OrderResponse{
+    uint32 orderId=1;
+}
+
+service OrderService{
+    rpc OrderAll(OrderRequest)returns(OrderResponse);
+}
