@@ -26,6 +26,7 @@ type CartServiceClient interface {
 	AddToCart(ctx context.Context, in *AddToCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	RemoveFromCart(ctx context.Context, in *RemoveFromCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	GetAllCartItems(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (CartService_GetAllCartItemsClient, error)
+	TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*NoParam, error)
 }
 
 type cartServiceClient struct {
@@ -95,6 +96,15 @@ func (x *cartServiceGetAllCartItemsClient) Recv() (*GetAllCartResponse, error) {
 	return m, nil
 }
 
+func (c *cartServiceClient) TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*NoParam, error) {
+	out := new(NoParam)
+	err := c.cc.Invoke(ctx, "/cart.CartService/TruncateCart", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CartServiceServer is the server API for CartService service.
 // All implementations must embed UnimplementedCartServiceServer
 // for forward compatibility
@@ -103,6 +113,7 @@ type CartServiceServer interface {
 	AddToCart(context.Context, *AddToCartRequest) (*CartResponse, error)
 	RemoveFromCart(context.Context, *RemoveFromCartRequest) (*CartResponse, error)
 	GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error
+	TruncateCart(context.Context, *UserCartCreate) (*NoParam, error)
 	mustEmbedUnimplementedCartServiceServer()
 }
 
@@ -121,6 +132,9 @@ func (UnimplementedCartServiceServer) RemoveFromCart(context.Context, *RemoveFro
 }
 func (UnimplementedCartServiceServer) GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAllCartItems not implemented")
+}
+func (UnimplementedCartServiceServer) TruncateCart(context.Context, *UserCartCreate) (*NoParam, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TruncateCart not implemented")
 }
 func (UnimplementedCartServiceServer) mustEmbedUnimplementedCartServiceServer() {}
 
@@ -210,6 +224,24 @@ func (x *cartServiceGetAllCartItemsServer) Send(m *GetAllCartResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _CartService_TruncateCart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserCartCreate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartServiceServer).TruncateCart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cart.CartService/TruncateCart",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartServiceServer).TruncateCart(ctx, req.(*UserCartCreate))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CartService_ServiceDesc is the grpc.ServiceDesc for CartService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +260,10 @@ var CartService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveFromCart",
 			Handler:    _CartService_RemoveFromCart_Handler,
+		},
+		{
+			MethodName: "TruncateCart",
+			Handler:    _CartService_TruncateCart_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

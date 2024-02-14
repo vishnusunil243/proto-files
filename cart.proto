@@ -31,9 +31,11 @@ message GetAllCartResponse{
     int32 quantity=3;
     float total=4;
 }
+message NoParam{}
 service CartService{
     rpc CreateCart(UserCartCreate)returns(CartResponse);
     rpc AddToCart(AddToCartRequest)returns(CartResponse);
     rpc RemoveFromCart(RemoveFromCartRequest)returns(CartResponse);
     rpc GetAllCartItems(UserCartCreate)returns(stream GetAllCartResponse){}
+    rpc TruncateCart(UserCartCreate)returns(NoParam);
 }
