@@ -19,7 +19,10 @@ message GetAllOrderResponse {
     uint32 order_status_id = 4;
     repeated OrderItems order_items = 5;
 }
-
+message ChangeOrderStatusRequest{
+    uint32 orderId=1;
+    uint32 statusId=2;
+}
 message OrderRequest{
    uint32 userId =1;
 }
@@ -31,7 +34,7 @@ message NoParam{}
 service OrderService{
     rpc OrderAll(OrderRequest)returns(OrderResponse);
     rpc UserCancelOrder(OrderResponse)returns(OrderResponse);
-    rpc ChangeOrderStatus(OrderResponse)returns(OrderResponse);
+    rpc ChangeOrderStatus(ChangeOrderStatusRequest)returns(OrderResponse);
     rpc GetAllOrdersUser(OrderRequest)returns(stream GetAllOrderResponse){}
     rpc GetAllOrders(NoParam)returns(stream GetAllOrderResponse){}
 }

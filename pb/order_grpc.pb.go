@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type OrderServiceClient interface {
 	OrderAll(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (*OrderResponse, error)
 	UserCancelOrder(ctx context.Context, in *OrderResponse, opts ...grpc.CallOption) (*OrderResponse, error)
-	ChangeOrderStatus(ctx context.Context, in *OrderResponse, opts ...grpc.CallOption) (*OrderResponse, error)
+	ChangeOrderStatus(ctx context.Context, in *ChangeOrderStatusRequest, opts ...grpc.CallOption) (*OrderResponse, error)
 	GetAllOrdersUser(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (OrderService_GetAllOrdersUserClient, error)
 	GetAllOrders(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (OrderService_GetAllOrdersClient, error)
 }
@@ -55,7 +55,7 @@ func (c *orderServiceClient) UserCancelOrder(ctx context.Context, in *OrderRespo
 	return out, nil
 }
 
-func (c *orderServiceClient) ChangeOrderStatus(ctx context.Context, in *OrderResponse, opts ...grpc.CallOption) (*OrderResponse, error) {
+func (c *orderServiceClient) ChangeOrderStatus(ctx context.Context, in *ChangeOrderStatusRequest, opts ...grpc.CallOption) (*OrderResponse, error) {
 	out := new(OrderResponse)
 	err := c.cc.Invoke(ctx, "/order.OrderService/ChangeOrderStatus", in, out, opts...)
 	if err != nil {
@@ -134,7 +134,7 @@ func (x *orderServiceGetAllOrdersClient) Recv() (*GetAllOrderResponse, error) {
 type OrderServiceServer interface {
 	OrderAll(context.Context, *OrderRequest) (*OrderResponse, error)
 	UserCancelOrder(context.Context, *OrderResponse) (*OrderResponse, error)
-	ChangeOrderStatus(context.Context, *OrderResponse) (*OrderResponse, error)
+	ChangeOrderStatus(context.Context, *ChangeOrderStatusRequest) (*OrderResponse, error)
 	GetAllOrdersUser(*OrderRequest, OrderService_GetAllOrdersUserServer) error
 	GetAllOrders(*NoParam, OrderService_GetAllOrdersServer) error
 	mustEmbedUnimplementedOrderServiceServer()
@@ -150,7 +150,7 @@ func (UnimplementedOrderServiceServer) OrderAll(context.Context, *OrderRequest) 
 func (UnimplementedOrderServiceServer) UserCancelOrder(context.Context, *OrderResponse) (*OrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserCancelOrder not implemented")
 }
-func (UnimplementedOrderServiceServer) ChangeOrderStatus(context.Context, *OrderResponse) (*OrderResponse, error) {
+func (UnimplementedOrderServiceServer) ChangeOrderStatus(context.Context, *ChangeOrderStatusRequest) (*OrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeOrderStatus not implemented")
 }
 func (UnimplementedOrderServiceServer) GetAllOrdersUser(*OrderRequest, OrderService_GetAllOrdersUserServer) error {
@@ -209,7 +209,7 @@ func _OrderService_UserCancelOrder_Handler(srv interface{}, ctx context.Context,
 }
 
 func _OrderService_ChangeOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OrderResponse)
+	in := new(ChangeOrderStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func _OrderService_ChangeOrderStatus_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/order.OrderService/ChangeOrderStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).ChangeOrderStatus(ctx, req.(*OrderResponse))
+		return srv.(OrderServiceServer).ChangeOrderStatus(ctx, req.(*ChangeOrderStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
