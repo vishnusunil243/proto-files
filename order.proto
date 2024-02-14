@@ -32,6 +32,6 @@ service OrderService{
     rpc OrderAll(OrderRequest)returns(OrderResponse);
     rpc UserCancelOrder(OrderResponse)returns(OrderResponse);
     rpc ChangeOrderStatus(OrderResponse)returns(OrderResponse);
-    rpc GetAllOrdersUser(OrderRequest)returns(GetAllOrderResponse);
-    rpc GetAllOrders(NoParam)returns(GetAllOrderResponse);
+    rpc GetAllOrdersUser(OrderRequest)returns(stream GetAllOrderResponse){}
+    rpc GetAllOrders(NoParam)returns(stream GetAllOrderResponse){}
 }
