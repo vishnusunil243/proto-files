@@ -4,6 +4,21 @@ package order;
 
 option go_package="./pb";
 
+message OrderItems {
+    uint32 id = 1;
+    uint32 order_id = 2;
+    uint32 product_id = 3;
+    int32 quantity = 4;
+    double total = 5;
+}
+
+message GetAllOrderResponse {
+    uint32 order_id = 1;
+    uint32 address_id = 2;
+    uint32 payment_type_id = 3;
+    uint32 order_status_id = 4;
+    repeated OrderItems order_items = 5;
+}
 
 message OrderRequest{
    uint32 userId =1;
@@ -11,7 +26,12 @@ message OrderRequest{
 message OrderResponse{
     uint32 orderId=1;
 }
+message NoParam{}
 
 service OrderService{
     rpc OrderAll(OrderRequest)returns(OrderResponse);
+    rpc UserCancelOrder(OrderResponse)returns(OrderResponse);
+    rpc ChangeOrderStatus(OrderResponse)returns(OrderResponse);
+    rpc GetAllOrdersUser(OrderRequest)returns(GetAllOrderResponse);
+    rpc GetAllOrders(NoParam)returns(GetAllOrderResponse);
 }
