@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -26,7 +27,7 @@ type CartServiceClient interface {
 	AddToCart(ctx context.Context, in *AddToCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	RemoveFromCart(ctx context.Context, in *RemoveFromCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	GetAllCartItems(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (CartService_GetAllCartItemsClient, error)
-	TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*NoParam, error)
+	TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type cartServiceClient struct {
@@ -96,8 +97,8 @@ func (x *cartServiceGetAllCartItemsClient) Recv() (*GetAllCartResponse, error) {
 	return m, nil
 }
 
-func (c *cartServiceClient) TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*NoParam, error) {
-	out := new(NoParam)
+func (c *cartServiceClient) TruncateCart(ctx context.Context, in *UserCartCreate, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/cart.CartService/TruncateCart", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -113,7 +114,7 @@ type CartServiceServer interface {
 	AddToCart(context.Context, *AddToCartRequest) (*CartResponse, error)
 	RemoveFromCart(context.Context, *RemoveFromCartRequest) (*CartResponse, error)
 	GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error
-	TruncateCart(context.Context, *UserCartCreate) (*NoParam, error)
+	TruncateCart(context.Context, *UserCartCreate) (*emptypb.Empty, error)
 	mustEmbedUnimplementedCartServiceServer()
 }
 
@@ -133,7 +134,7 @@ func (UnimplementedCartServiceServer) RemoveFromCart(context.Context, *RemoveFro
 func (UnimplementedCartServiceServer) GetAllCartItems(*UserCartCreate, CartService_GetAllCartItemsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAllCartItems not implemented")
 }
-func (UnimplementedCartServiceServer) TruncateCart(context.Context, *UserCartCreate) (*NoParam, error) {
+func (UnimplementedCartServiceServer) TruncateCart(context.Context, *UserCartCreate) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TruncateCart not implemented")
 }
 func (UnimplementedCartServiceServer) mustEmbedUnimplementedCartServiceServer() {}
