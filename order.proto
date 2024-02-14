@@ -36,4 +36,5 @@ service OrderService{
     rpc ChangeOrderStatus(ChangeOrderStatusRequest)returns(OrderResponse);
     rpc GetAllOrdersUser(OrderRequest)returns(stream GetAllOrderResponse){}
     rpc GetAllOrders(NoParam)returns(stream GetAllOrderResponse){}
+    rpc GetOrder(OrderResponse)returns(GetAllOrderResponse);
 }
