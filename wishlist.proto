@@ -4,6 +4,8 @@ package wishlist;
 
 option go_package="./pb";
 
+import "google/protobuf/empty.proto";
+
 message CreateWishlistRequest{
 uint32 userId =1;
 }
@@ -11,8 +13,8 @@ message AddToWishlistRequest{
     uint32 userId=1;
     uint32 productId=2;
 }
-message NoParam{}
+
 service WishlistService{
-    rpc CreateWishlist(CreateWishlistRequest)returns(NoParam);
+    rpc CreateWishlist(CreateWishlistRequest)returns(google.protobuf.Empty);
     rpc AddToWishlist(AddToWishlistRequest)returns(CreateWishlistRequest);
 }
