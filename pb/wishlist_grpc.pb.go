@@ -25,6 +25,8 @@ const _ = grpc.SupportPackageIsVersion7
 type WishlistServiceClient interface {
 	CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddToWishlist(ctx context.Context, in *AddToWishlistRequest, opts ...grpc.CallOption) (*CreateWishlistRequest, error)
+	RemoveFromWishlist(ctx context.Context, in *AddToWishlistRequest, opts ...grpc.CallOption) (*CreateWishlistRequest, error)
+	GetAllWishlistItems(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (WishlistService_GetAllWishlistItemsClient, error)
 }
 
 type wishlistServiceClient struct {
@@ -53,12 +55,55 @@ func (c *wishlistServiceClient) AddToWishlist(ctx context.Context, in *AddToWish
 	return out, nil
 }
 
+func (c *wishlistServiceClient) RemoveFromWishlist(ctx context.Context, in *AddToWishlistRequest, opts ...grpc.CallOption) (*CreateWishlistRequest, error) {
+	out := new(CreateWishlistRequest)
+	err := c.cc.Invoke(ctx, "/wishlist.WishlistService/RemoveFromWishlist", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *wishlistServiceClient) GetAllWishlistItems(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (WishlistService_GetAllWishlistItemsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &WishlistService_ServiceDesc.Streams[0], "/wishlist.WishlistService/GetAllWishlistItems", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &wishlistServiceGetAllWishlistItemsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type WishlistService_GetAllWishlistItemsClient interface {
+	Recv() (*GetAllWishlistResponse, error)
+	grpc.ClientStream
+}
+
+type wishlistServiceGetAllWishlistItemsClient struct {
+	grpc.ClientStream
+}
+
+func (x *wishlistServiceGetAllWishlistItemsClient) Recv() (*GetAllWishlistResponse, error) {
+	m := new(GetAllWishlistResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // WishlistServiceServer is the server API for WishlistService service.
 // All implementations must embed UnimplementedWishlistServiceServer
 // for forward compatibility
 type WishlistServiceServer interface {
 	CreateWishlist(context.Context, *CreateWishlistRequest) (*emptypb.Empty, error)
 	AddToWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error)
+	RemoveFromWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error)
+	GetAllWishlistItems(*CreateWishlistRequest, WishlistService_GetAllWishlistItemsServer) error
 	mustEmbedUnimplementedWishlistServiceServer()
 }
 
@@ -71,6 +116,12 @@ func (UnimplementedWishlistServiceServer) CreateWishlist(context.Context, *Creat
 }
 func (UnimplementedWishlistServiceServer) AddToWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddToWishlist not implemented")
+}
+func (UnimplementedWishlistServiceServer) RemoveFromWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveFromWishlist not implemented")
+}
+func (UnimplementedWishlistServiceServer) GetAllWishlistItems(*CreateWishlistRequest, WishlistService_GetAllWishlistItemsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllWishlistItems not implemented")
 }
 func (UnimplementedWishlistServiceServer) mustEmbedUnimplementedWishlistServiceServer() {}
 
@@ -121,6 +172,45 @@ func _WishlistService_AddToWishlist_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WishlistService_RemoveFromWishlist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddToWishlistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WishlistServiceServer).RemoveFromWishlist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/wishlist.WishlistService/RemoveFromWishlist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WishlistServiceServer).RemoveFromWishlist(ctx, req.(*AddToWishlistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WishlistService_GetAllWishlistItems_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(CreateWishlistRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(WishlistServiceServer).GetAllWishlistItems(m, &wishlistServiceGetAllWishlistItemsServer{stream})
+}
+
+type WishlistService_GetAllWishlistItemsServer interface {
+	Send(*GetAllWishlistResponse) error
+	grpc.ServerStream
+}
+
+type wishlistServiceGetAllWishlistItemsServer struct {
+	grpc.ServerStream
+}
+
+func (x *wishlistServiceGetAllWishlistItemsServer) Send(m *GetAllWishlistResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // WishlistService_ServiceDesc is the grpc.ServiceDesc for WishlistService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -136,7 +226,17 @@ var WishlistService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "AddToWishlist",
 			Handler:    _WishlistService_AddToWishlist_Handler,
 		},
+		{
+			MethodName: "RemoveFromWishlist",
+			Handler:    _WishlistService_RemoveFromWishlist_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllWishlistItems",
+			Handler:       _WishlistService_GetAllWishlistItems_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "wishlist.proto",
 }
