@@ -34,7 +34,7 @@ type UserServiceClient interface {
 	GetUser(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*UserSignupResponse, error)
 	AddAddress(ctx context.Context, in *AddAddressRequest, opts ...grpc.CallOption) (*GetUserById, error)
 	RemoveAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*GetUserById, error)
-	GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*AddAddressRequest, error)
+	GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*GetAddressResponse, error)
 }
 
 type userServiceClient struct {
@@ -190,8 +190,8 @@ func (c *userServiceClient) RemoveAddress(ctx context.Context, in *GetUserById, 
 	return out, nil
 }
 
-func (c *userServiceClient) GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*AddAddressRequest, error) {
-	out := new(AddAddressRequest)
+func (c *userServiceClient) GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*GetAddressResponse, error) {
+	out := new(GetAddressResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/GetAddress", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ type UserServiceServer interface {
 	GetUser(context.Context, *GetUserById) (*UserSignupResponse, error)
 	AddAddress(context.Context, *AddAddressRequest) (*GetUserById, error)
 	RemoveAddress(context.Context, *GetUserById) (*GetUserById, error)
-	GetAddress(context.Context, *GetUserById) (*AddAddressRequest, error)
+	GetAddress(context.Context, *GetUserById) (*GetAddressResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -255,7 +255,7 @@ func (UnimplementedUserServiceServer) AddAddress(context.Context, *AddAddressReq
 func (UnimplementedUserServiceServer) RemoveAddress(context.Context, *GetUserById) (*GetUserById, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveAddress not implemented")
 }
-func (UnimplementedUserServiceServer) GetAddress(context.Context, *GetUserById) (*AddAddressRequest, error) {
+func (UnimplementedUserServiceServer) GetAddress(context.Context, *GetUserById) (*GetAddressResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAddress not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

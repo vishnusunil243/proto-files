@@ -31,6 +31,14 @@ message AddAddressRequest{
     string road=4;
     string district=5;
 }
+message GetAddressResponse{
+    uint32 userId=1;
+    string city=2;
+    string state=3;
+    string road=4;
+    string district=5;
+    uint32 id=6;
+}
 service UserService{
     rpc UserSignup(UserSignupRequest)returns(UserSignupResponse);
     rpc UserLogin(UserLoginRequest)returns(UserSignupResponse);
@@ -43,5 +51,5 @@ service UserService{
     rpc GetUser(GetUserById)returns(UserSignupResponse);
     rpc AddAddress(AddAddressRequest)returns(GetUserById);
     rpc RemoveAddress(GetUserById)returns(GetUserById);
-    rpc GetAddress(GetUserById)returns(AddAddressRequest);
+    rpc GetAddress(GetUserById)returns(GetAddressResponse);
 }
