@@ -32,6 +32,9 @@ type UserServiceClient interface {
 	AddAdmin(ctx context.Context, in *UserSignupRequest, opts ...grpc.CallOption) (*UserSignupResponse, error)
 	GetAdmin(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*UserSignupResponse, error)
 	GetUser(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*UserSignupResponse, error)
+	AddAddress(ctx context.Context, in *AddAddressRequest, opts ...grpc.CallOption) (*GetUserById, error)
+	RemoveAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*GetUserById, error)
+	GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*AddAddressRequest, error)
 }
 
 type userServiceClient struct {
@@ -169,6 +172,33 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserById, opts .
 	return out, nil
 }
 
+func (c *userServiceClient) AddAddress(ctx context.Context, in *AddAddressRequest, opts ...grpc.CallOption) (*GetUserById, error) {
+	out := new(GetUserById)
+	err := c.cc.Invoke(ctx, "/user.UserService/AddAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) RemoveAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*GetUserById, error) {
+	out := new(GetUserById)
+	err := c.cc.Invoke(ctx, "/user.UserService/RemoveAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetAddress(ctx context.Context, in *GetUserById, opts ...grpc.CallOption) (*AddAddressRequest, error) {
+	out := new(AddAddressRequest)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -182,6 +212,9 @@ type UserServiceServer interface {
 	AddAdmin(context.Context, *UserSignupRequest) (*UserSignupResponse, error)
 	GetAdmin(context.Context, *GetUserById) (*UserSignupResponse, error)
 	GetUser(context.Context, *GetUserById) (*UserSignupResponse, error)
+	AddAddress(context.Context, *AddAddressRequest) (*GetUserById, error)
+	RemoveAddress(context.Context, *GetUserById) (*GetUserById, error)
+	GetAddress(context.Context, *GetUserById) (*AddAddressRequest, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -215,6 +248,15 @@ func (UnimplementedUserServiceServer) GetAdmin(context.Context, *GetUserById) (*
 }
 func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserById) (*UserSignupResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUserServiceServer) AddAddress(context.Context, *AddAddressRequest) (*GetUserById, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAddress not implemented")
+}
+func (UnimplementedUserServiceServer) RemoveAddress(context.Context, *GetUserById) (*GetUserById, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveAddress not implemented")
+}
+func (UnimplementedUserServiceServer) GetAddress(context.Context, *GetUserById) (*AddAddressRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAddress not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -397,6 +439,60 @@ func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_AddAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/AddAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddAddress(ctx, req.(*AddAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_RemoveAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserById)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).RemoveAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/RemoveAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).RemoveAddress(ctx, req.(*GetUserById))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserById)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetAddress(ctx, req.(*GetUserById))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -431,6 +527,18 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _UserService_GetUser_Handler,
+		},
+		{
+			MethodName: "AddAddress",
+			Handler:    _UserService_AddAddress_Handler,
+		},
+		{
+			MethodName: "RemoveAddress",
+			Handler:    _UserService_RemoveAddress_Handler,
+		},
+		{
+			MethodName: "GetAddress",
+			Handler:    _UserService_GetAddress_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
