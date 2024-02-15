@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WishlistServiceClient interface {
-	CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*NoParam, error)
+	CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddToWishlist(ctx context.Context, in *AddToWishlistRequest, opts ...grpc.CallOption) (*CreateWishlistRequest, error)
 }
 
@@ -34,8 +35,8 @@ func NewWishlistServiceClient(cc grpc.ClientConnInterface) WishlistServiceClient
 	return &wishlistServiceClient{cc}
 }
 
-func (c *wishlistServiceClient) CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*NoParam, error) {
-	out := new(NoParam)
+func (c *wishlistServiceClient) CreateWishlist(ctx context.Context, in *CreateWishlistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/wishlist.WishlistService/CreateWishlist", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (c *wishlistServiceClient) AddToWishlist(ctx context.Context, in *AddToWish
 // All implementations must embed UnimplementedWishlistServiceServer
 // for forward compatibility
 type WishlistServiceServer interface {
-	CreateWishlist(context.Context, *CreateWishlistRequest) (*NoParam, error)
+	CreateWishlist(context.Context, *CreateWishlistRequest) (*emptypb.Empty, error)
 	AddToWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error)
 	mustEmbedUnimplementedWishlistServiceServer()
 }
@@ -65,7 +66,7 @@ type WishlistServiceServer interface {
 type UnimplementedWishlistServiceServer struct {
 }
 
-func (UnimplementedWishlistServiceServer) CreateWishlist(context.Context, *CreateWishlistRequest) (*NoParam, error) {
+func (UnimplementedWishlistServiceServer) CreateWishlist(context.Context, *CreateWishlistRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWishlist not implemented")
 }
 func (UnimplementedWishlistServiceServer) AddToWishlist(context.Context, *AddToWishlistRequest) (*CreateWishlistRequest, error) {
